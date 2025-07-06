@@ -1,0 +1,6 @@
+@entrega_final_arquitecturas_web_HostAddress = http://localhost:5188
+
+GET {{entrega_final_arquitecturas_web_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
