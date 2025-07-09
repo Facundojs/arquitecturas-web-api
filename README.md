@@ -43,3 +43,71 @@ curl --location 'localhost:5188/api/iam/refresh' \
     "refreshToken": "f8decejMrUwZTG0uK+KY4lnE9pz9NKffuVQiYhNGcpw="
 }
 ```
+
+# Create Book
+## Request
+```sh
+curl --location 'localhost:5188/api/books' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer {{access_token}}' \
+--data '{
+    "nombre": "Prueba libro 2",
+    "descripcion": "Prueba de crear libro con un user"
+}'
+```
+## Response
+```json
+{
+    "id": 4,
+    "name": "Prueba libro 2",
+    "description": "Prueba de crear libro con un user",
+    "userId": 2,
+    "user": null
+}
+```
+
+# List Books
+## Request
+```sh
+curl --location --request GET 'localhost:5188/api/books' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer {{access_token}}' \
+--data '{
+    "nombre": "Prueba libro",
+    "descripcion": "Prueba de crear libro con un user"
+}'
+```
+## Response
+```json
+[
+    {
+        "id": 3,
+        "name": "Prueba libro 2",
+        "description": "Prueba de crear libro con un user",
+        "userId": 2,
+        "user": null
+    }
+]
+```
+
+# Delete Book
+## Request
+```
+curl --location --request DELETE 'localhost:5188/api/books/:id' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer {{access_token}}' \
+```
+
+# Update Book
+## Request
+```sh
+curl --location --request PUT 'localhost:5188/api/books/:id' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer {{access_token}}' \
+--data '{
+    "nombre": "Prueba libro 2",
+    "descripcion": "Prueba de crear libro con un user"
+}'
+```
+
+
