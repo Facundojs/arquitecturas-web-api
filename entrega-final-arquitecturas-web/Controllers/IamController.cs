@@ -11,37 +11,28 @@ namespace entrega_final_arquitecturas_web.Controllers
     [Route("api/iam")]
     [ApiController]
     [AllowAnonymous]
-    public class Iam : ControllerBase
+    public class IamController(DbCtx dbCtx, JwtService jwtService, ILogger<IamController> logger) : ControllerBase
     {
-        private readonly DbCtx _dbCtx;
-        private readonly JwtService _jwtService;
-
-        public Iam(DbCtx dbCtx, JwtService jwtService)
-        {
-            _jwtService = jwtService;
-            _dbCtx = dbCtx;
-        }
-
         [HttpPost]
         [Route("registro")]
         public async Task<IActionResult> Registro(RegistroDTO dto)
         {
-            var usuarioExistente = await _dbCtx.Users.Where(u => u.Email == dto.Email).FirstOrDefaultAsync();
+            var usuarioExistente = await dbCtx.Users.Where(u => u.Email == dto.Email).FirstOrDefaultAsync();
 
             if(usuarioExistente != null) return StatusCode(StatusCodes.Status412PreconditionFailed);
 
-            var Salt = _jwtService.GenerateSalt();
+            var Salt = jwtService.GenerateSalt();
 
             var user = new User
             {
-                PasswordHash = _jwtService.EncryptSHA256(dto.Password, Salt),
+                PasswordHash = jwtService.EncryptSHA256(dto.Password, Salt),
                 UserName = dto.Nombre,
                 Email = dto.Email,
                 Salt = Salt,
             };
 
-            await _dbCtx.Users.AddAsync(user);
-            await _dbCtx.SaveChangesAsync();
+            await dbCtx.Users.AddAsync(user);
+            await dbCtx.SaveChangesAsync();
 
             var success = user.Id != 0;
             var statusCode = success ? StatusCodes.Status200OK : StatusCodes.Status422UnprocessableEntity;
@@ -55,7 +46,7 @@ namespace entrega_final_arquitecturas_web.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login(LoginDTO dto)
         {
-            var usuarioEncontrado = await _dbCtx.Users
+            var usuarioEncontrado = await dbCtx.Users
                 .Where(u => u.Email == dto.Email)
                 .FirstOrDefaultAsync();
 
@@ -64,19 +55,19 @@ namespace entrega_final_arquitecturas_web.Controllers
 
             var salt = usuarioEncontrado.Salt;
 
-            var hashedPassword = _jwtService.EncryptSHA256(dto.Password, salt);
+            var hashedPassword = jwtService.EncryptSHA256(dto.Password, salt);
 
             if (hashedPassword != usuarioEncontrado.PasswordHash)
                 return StatusCode(StatusCodes.Status403Forbidden);
 
-            var token = _jwtService.GenerarJWT(usuarioEncontrado);
-            var refreshToken = _jwtService.GenerarRefreshToken();
+            var token = jwtService.GenerarJWT(usuarioEncontrado);
+            var refreshToken = jwtService.GenerarRefreshToken();
 
-            await _dbCtx.RefreshTokens
+            await dbCtx.RefreshTokens
                 .Where(token => token.UserId == usuarioEncontrado.Id)
                 .ExecuteDeleteAsync();
 
-            await _dbCtx.RefreshTokens.AddAsync(
+            await dbCtx.RefreshTokens.AddAsync(
                 new RefreshToken 
                 {
                     UserId = usuarioEncontrado.Id,
@@ -85,7 +76,7 @@ namespace entrega_final_arquitecturas_web.Controllers
                 }    
             );
 
-            await _dbCtx.SaveChangesAsync();
+            await dbCtx.SaveChangesAsync();
 
             return StatusCode(StatusCodes.Status200OK, new { token, refreshToken });
         }
@@ -95,24 +86,24 @@ namespace entrega_final_arquitecturas_web.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Refresh(RefreshDTO dto)
         {
-            var refreshToken = await _dbCtx.RefreshTokens.FirstOrDefaultAsync(token => token.Token == dto.Refresh && token.Expires > DateTime.Now);
+            var refreshToken = await dbCtx.RefreshTokens.FirstOrDefaultAsync(token => token.Token == dto.Refresh && token.Expires > DateTime.Now);
 
             if (refreshToken == null)
             {
                 return BadRequest("Invalid access token or refresh token");
             }
 
-            var usuario = await _dbCtx.Users.Where(user => user.Id == refreshToken.UserId).FirstOrDefaultAsync();
+            var usuario = await dbCtx.Users.Where(user => user.Id == refreshToken.UserId).FirstOrDefaultAsync();
 
-            var newAccessToken = _jwtService.GenerarJWT(usuario!);
+            var newAccessToken = jwtService.GenerarJWT(usuario!);
 
-            var newRefreshToken = _jwtService.GenerarRefreshToken();
+            var newRefreshToken = jwtService.GenerarRefreshToken();
 
-            await _dbCtx.RefreshTokens
+            await dbCtx.RefreshTokens
                 .Where(token => token.UserId == usuario.Id)
                 .ExecuteDeleteAsync();
 
-            await _dbCtx.RefreshTokens.AddAsync(
+            await dbCtx.RefreshTokens.AddAsync(
                 new RefreshToken
                 {
                     UserId = usuario.Id,
@@ -121,7 +112,7 @@ namespace entrega_final_arquitecturas_web.Controllers
                 }
             );
 
-            await _dbCtx.SaveChangesAsync();
+            await dbCtx.SaveChangesAsync();
 
             return Ok(new
             {
