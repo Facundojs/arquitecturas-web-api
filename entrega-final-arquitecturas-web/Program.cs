@@ -19,6 +19,7 @@ builder.Services.AddDbContext<DbCtx>(options =>
 });
 
 builder.Services.AddSingleton<JwtService>();
+builder.Services.AddScoped<UserService>();
 
 builder.Services.AddAuthentication(config => {
     config.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

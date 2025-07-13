@@ -7,42 +7,96 @@ using entrega_final_arquitecturas_web.Domain.Service;
 using entrega_final_arquitecturas_web.Domain.DTO;
 using System;
 using System.Security.Claims;
+using entrega_final_arquitecturas_web.Domain.Entities;
 
 namespace entrega_final_arquitecturas_web.Controllers
 {
     [Route("api/iam")]
     [ApiController]
-    [AllowAnonymous]
-    public class IamController(DbCtx dbCtx, JwtService jwtService, ILogger<IamController> logger) : ControllerBase
+    public class IamController(DbCtx dbCtx, JwtService jwtService, ILogger<IamController> logger, UserService userService) : ControllerBase
     {
+        [HttpGet]
+        [Route("perfil")]
+        public async Task<IActionResult> Perfil()
+        {
+            var userId = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var user = await userService.GetUserWithPrivilegesByIdAsync(userId);
+
+            return StatusCode(StatusCodes.Status200OK, new UsuarioDTO(user));
+        }
+
+
         [HttpPost]
         [Route("registro")]
         public async Task<IActionResult> Registro(RegistroDTO dto)
         {
             var userId = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-            var user = await GetUserWithPrivilegesByIdAsync(userId);
+            var user = await userService.GetUserWithPrivilegesByIdAsync(userId);
 
-            if (user == null || !user.Privileges.Any(p => p == "ADMIN"))
+            if (!user.Has(PrivilegeEnum.USERS_CREATE))
             {
                 return StatusCode(StatusCodes.Status403Forbidden);
             }
 
-            var usuarioExistente = await dbCtx.Users.Where(u => u.Email == dto.Email)
+            var usuarioExistente = await dbCtx.Users
+                .Where(u => u.Email == dto.Email)
                 .FirstOrDefaultAsync();
 
-            if(usuarioExistente != null) return StatusCode(StatusCodes.Status412PreconditionFailed);
+            if (usuarioExistente != null)
+                return StatusCode(StatusCodes.Status412PreconditionFailed);
 
-            var Salt = jwtService.GenerateSalt();
+            var salt = jwtService.GenerateSalt();
 
             var newUser = new User
             {
-                PasswordHash = jwtService.EncryptSHA256(dto.Password, Salt),
+                PasswordHash = jwtService.EncryptSHA256(dto.Password, salt),
                 UserName = dto.Nombre,
                 Email = dto.Email,
-                Salt = Salt,
+                Salt = salt,
             };
 
+            if (dto.Privilegios.Count == 0) {
+                return BadRequest(new
+                {
+                    Message = "Debes asignar por lo menos un privilegio",
+                });
+            }
+
+            var privilegiosEnBbdd = new List<Privilege>();
+
+            // traer los privilegios de la base
+            if (dto.Privilegios.Any())
+            {
+                privilegiosEnBbdd = await dbCtx.Privileges
+                    .Where(p => dto.Privilegios.Contains(p.Name))
+                    .ToListAsync();
+
+                // Validar si hay privilegios inexistentes
+                var nombresEncontrados = privilegiosEnBbdd.Select(p => p.Name).ToList();
+                var nombresInvalidos = dto.Privilegios
+                    .Except(nombresEncontrados, StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+
+                if (nombresInvalidos.Any())
+                {
+                    return BadRequest(new
+                    {
+                        Message = "Uno o más privilegios no son válidos.",
+                        InvalidPrivileges = nombresInvalidos
+                    });
+                }
+            }
+
             await dbCtx.Users.AddAsync(newUser);
+            await dbCtx.SaveChangesAsync();
+
+            var usersPrivileges = privilegiosEnBbdd.Select(p => new UsersPrivilege
+            {
+                UserId = newUser.Id,
+                PrivilegeId = p.Id
+            });
+
+            await dbCtx.UsersPrivileges.AddRangeAsync(usersPrivileges);
             await dbCtx.SaveChangesAsync();
 
             var success = newUser.Id != 0;
@@ -50,6 +104,7 @@ namespace entrega_final_arquitecturas_web.Controllers
 
             return StatusCode(statusCode);
         }
+
 
         [HttpPost]
         [Route("login")]
@@ -129,32 +184,6 @@ namespace entrega_final_arquitecturas_web.Controllers
                 token = newAccessToken,
                 refreshToken = newRefreshToken
             });
-        }
-
-        private async Task<UserWithPrivilegesDTO?> GetUserWithPrivilegesByIdAsync(int userId)
-        {
-            var user = await dbCtx.Users
-                .Where(u => u.Id == userId)
-                .Select(u => new UserWithPrivilegesDTO
-                {
-                    Id = u.Id,
-                    UserName = u.UserName,
-                    Email = u.Email,
-                    Privileges = u.UsersPrivileges
-                        .Select(up => up.Privilege.Name)
-                        .ToList()
-                })
-                .FirstOrDefaultAsync();
-
-            return user;
-        }
-
-        private class UserWithPrivilegesDTO
-        {
-            public int Id { get; set; }
-            public string UserName { get; set; } = null!;
-            public string Email { get; set; } = null!;
-            public List<string> Privileges { get; set; } = new();
         }
     }
 }

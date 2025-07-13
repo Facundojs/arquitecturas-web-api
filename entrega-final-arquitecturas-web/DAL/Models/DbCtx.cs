@@ -26,7 +26,7 @@ public partial class DbCtx : DbContext
     public virtual DbSet<UsersPrivilege> UsersPrivileges { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Data Source=Facundo-PC;Initial Catalog=Tp-Arquitecturas-Web;Integrated Security=True;Trust Server Certificate=True");
+        => optionsBuilder.UseSqlServer();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
