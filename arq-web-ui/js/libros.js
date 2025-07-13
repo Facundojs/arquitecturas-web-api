@@ -1,12 +1,6 @@
-const apiURL = 'https://tubackend.com/api/libros'; /* backeend!!!!!!!!!!!!!!!!! */
-let token = localStorage.getItem('token');
-
-if (!token) window.location.href = 'login.html';
-
-const headers = {
-  'Content-Type': 'application/json',
-  'Authorization': `Bearer ${token}`
-};
+if (!localStorage.getItem('token')) {
+  window.location.href = 'login.html';
+}
 
 window.addEventListener('DOMContentLoaded', cargarLibros);
 
@@ -18,23 +12,19 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
 document.getElementById('crearForm').addEventListener('submit', async e => {
   e.preventDefault();
   const nuevo = {
-    titulo: document.getElementById('crearTitulo').value,
-    autor: document.getElementById('crearAutor').value,
-    descripcion: document.getElementById('crearDescripcion').value
+    name: document.getElementById('crearTitulo').value,
+    author: document.getElementById('crearAutor').value,
+    description: document.getElementById('crearDescripcion').value,
+    category: "General"
   };
 
-  const res = await fetch(apiURL, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify(nuevo)
-  });
-
-  if (res.ok) {
+  try {
+    await window.Api.createBook(nuevo);
     alert('Libro creado con éxito');
     document.getElementById('crearForm').reset();
     cargarLibros();
-  } else {
-    alert('Error al crear');
+  } catch (err) {
+    alert(err.message);
   }
 });
 
@@ -42,22 +32,18 @@ document.getElementById('editarForm').addEventListener('submit', async e => {
   e.preventDefault();
   const id = document.getElementById('editarId').value;
   const modificado = {
-    titulo: document.getElementById('editarTitulo').value,
-    autor: document.getElementById('editarAutor').value,
-    descripcion: document.getElementById('editarDescripcion').value
+    name: document.getElementById('editarTitulo').value,
+    author: document.getElementById('editarAutor').value,
+    description: document.getElementById('editarDescripcion').value,
+    category: "General"
   };
 
-  const res = await fetch(`${apiURL}/${id}`, {
-    method: 'PUT',
-    headers,
-    body: JSON.stringify(modificado)
-  });
-
-  if (res.ok) {
+  try {
+    await window.Api.updateBook(id, modificado);
     alert('Libro actualizado');
     cargarLibros();
-  } else {
-    alert('Error al actualizar');
+  } catch (err) {
+    alert(err.message);
   }
 });
 
@@ -65,42 +51,41 @@ document.getElementById('eliminarBtn').addEventListener('click', async () => {
   const id = document.getElementById('editarId').value;
   if (!confirm('¿Seguro que querés eliminar este registro?')) return;
 
-  const res = await fetch(`${apiURL}/${id}`, {
-    method: 'DELETE',
-    headers
-  });
-
-  if (res.ok) {
+  try {
+    await window.Api.deleteBook(id);
     alert('Libro eliminado');
-    cargarLibros();
     document.getElementById('editarForm').reset();
-  } else {
-    alert('Error al eliminar');
+    cargarLibros();
+  } catch (err) {
+    alert(err.message);
   }
 });
 
 async function cargarLibros() {
-  const res = await fetch(apiURL, { headers });
-  const data = await res.json();
-  const tbody = document.querySelector('#tablaLibros tbody');
-  tbody.innerHTML = '';
+  try {
+    const data = await window.Api.getBooks();
+    const tbody = document.querySelector('#tablaLibros tbody');
+    tbody.innerHTML = '';
 
-  data.forEach(libro => {
-    const fila = document.createElement('tr');
-    fila.innerHTML = `
-      <td>${libro.id}</td>
-      <td>${libro.titulo}</td>
-      <td>${libro.autor}</td>
-      <td>${libro.descripcion}</td>
-    `;
-    fila.addEventListener('click', () => seleccionarLibro(libro));
-    tbody.appendChild(fila);
-  });
+    data.forEach(libro => {
+      const fila = document.createElement('tr');
+      fila.innerHTML = `
+        <td>${libro.id}</td>
+        <td>${libro.name}</td>
+        <td>${libro.author}</td>
+        <td>${libro.description}</td>
+      `;
+      fila.addEventListener('click', () => seleccionarLibro(libro));
+      tbody.appendChild(fila);
+    });
+  } catch (err) {
+    alert(err.message);
+  }
 }
 
 function seleccionarLibro(libro) {
   document.getElementById('editarId').value = libro.id;
-  document.getElementById('editarTitulo').value = libro.titulo;
-  document.getElementById('editarAutor').value = libro.autor;
-  document.getElementById('editarDescripcion').value = libro.descripcion;
+  document.getElementById('editarTitulo').value = libro.name;
+  document.getElementById('editarAutor').value = libro.author;
+  document.getElementById('editarDescripcion').value = libro.description;
 }

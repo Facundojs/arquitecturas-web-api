@@ -18,21 +18,10 @@ document.getElementById('registroForm').addEventListener('submit', async (e) => 
   }
 
   try {
-    const response = await fetch('https://tubackend.com/api/register', /* backeend!!!!!!!!!!!!!!!!! */{
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nombre, apellido, email, password })
-    });
-
-    if (response.ok) {
-      alert('Usuario creado con éxito. Ahora podés iniciar sesión.');
-      window.location.href = 'login.html';
-    } else {
-      const { message } = await response.json();
-      alert(message || 'Error al registrarse.');
-    }
+    await window.Api.register(nombre, apellido, email, password);
+    alert('Usuario creado con éxito. Ahora podés iniciar sesión.');
+    window.location.href = 'login.html';
   } catch (error) {
-    console.error(error);
-    alert('Error al conectar con el servidor.');
+    alert(error.message);
   }
 });

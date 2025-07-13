@@ -17,15 +17,17 @@ namespace entrega_final_arquitecturas_web.Controllers
     {
         [HttpPost]
         [Route("registro")]
+        [AllowAnonymous]
         public async Task<IActionResult> Registro(RegistroDTO dto)
         {
+            /*
             var userId = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             var user = await GetUserWithPrivilegesByIdAsync(userId);
 
             if (user == null || !user.Privileges.Any(p => p == "ADMIN"))
             {
                 return StatusCode(StatusCodes.Status403Forbidden);
-            }
+            }*/
 
             var usuarioExistente = await dbCtx.Users.Where(u => u.Email == dto.Email)
                 .FirstOrDefaultAsync();
