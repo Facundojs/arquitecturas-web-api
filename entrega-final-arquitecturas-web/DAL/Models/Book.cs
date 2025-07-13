@@ -11,7 +11,7 @@ public partial class Book
 
     public string Description { get; set; } = null!;
 
-    public int UserId { get; set; }
+    public string Author { get; set; } = null!;
 
-    public virtual User User { get; set; } = null!;
+    public string Category { get; set; } = null!;
 }

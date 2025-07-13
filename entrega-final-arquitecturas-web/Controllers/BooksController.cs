@@ -20,7 +20,7 @@ namespace entrega_final_arquitecturas_web.Controllers
         {
             var userId = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
-            var books = await dbCtx.Books.Where(book => book.UserId == userId).ToArrayAsync();
+            var books = await dbCtx.Books.ToArrayAsync();
 
             return books;
         }
@@ -34,7 +34,8 @@ namespace entrega_final_arquitecturas_web.Controllers
             {
                 Description = dto.Descripcion,
                 Name = dto.Nombre,
-                UserId = userId,
+                Author = dto.Autor,
+                Category = dto.Categoria,
             };
 
             await dbCtx.Books.AddAsync(book);
@@ -55,7 +56,7 @@ namespace entrega_final_arquitecturas_web.Controllers
             var userId = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
             var book = await dbCtx.Books
-                .Where(book => book.Id == id && book.UserId == userId)
+                .Where(book => book.Id == id)
                 .FirstOrDefaultAsync();
 
             if (book == null)
@@ -65,6 +66,8 @@ namespace entrega_final_arquitecturas_web.Controllers
 
             book.Name = dto.Nombre;
             book.Description = dto.Descripcion;
+            book.Author = dto.Autor;
+            book.Category = dto.Categoria;
 
             await dbCtx.SaveChangesAsync();
 
@@ -77,7 +80,7 @@ namespace entrega_final_arquitecturas_web.Controllers
             var userId = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
             var book = await dbCtx.Books
-                .Where(book => book.Id == id && book.UserId == userId)
+                .Where(book => book.Id == id)
                 .FirstOrDefaultAsync();
 
             if (book == null)

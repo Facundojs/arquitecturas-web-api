@@ -140,7 +140,7 @@ namespace entrega_final_arquitecturas_web.Controllers
                     UserName = u.UserName,
                     Email = u.Email,
                     Privileges = u.UsersPrivileges
-                        .Select(up => up.Privilege.Description)
+                        .Select(up => up.Privilege.Name)
                         .ToList()
                 })
                 .FirstOrDefaultAsync();
