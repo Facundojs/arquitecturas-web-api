@@ -23,9 +23,10 @@ document.getElementById('crearForm').addEventListener('submit', async e => {
   errorContainer.textContent = '';
 
   const nuevo = {
-    titulo: document.getElementById('crearTitulo').value,
-    autor: document.getElementById('crearAutor').value,
-    descripcion: document.getElementById('crearDescripcion').value
+    Nombre: document.getElementById('crearTitulo').value,
+    Autor: document.getElementById('crearAutor').value,
+    Descripcion: document.getElementById('crearDescripcion').value,
+    Categoria: "General"
   };
 
   try {
@@ -46,9 +47,10 @@ document.getElementById('editarForm').addEventListener('submit', async e => {
 
   const id = document.getElementById('editarId').value;
   const modificado = {
-    titulo: document.getElementById('editarTitulo').value,
-    autor: document.getElementById('editarAutor').value,
-    descripcion: document.getElementById('editarDescripcion').value
+    Nombre: document.getElementById('editarTitulo').value,
+    Autor: document.getElementById('editarAutor').value,
+    Descripcion: document.getElementById('editarDescripcion').value,
+    Categoria: "General"
   };
 
   try {
@@ -92,9 +94,9 @@ async function cargarLibros() {
       const fila = document.createElement('tr');
       fila.innerHTML = `
         <td>${libro.id}</td>
-        <td>${libro.titulo}</td>
-        <td>${libro.autor}</td>
-        <td>${libro.descripcion}</td>
+        <td>${libro.name}</td>
+        <td>${libro.author}</td>
+        <td>${libro.description}</td>
       `;
       fila.addEventListener('click', () => seleccionarLibro(libro));
       tbody.appendChild(fila);
@@ -107,7 +109,7 @@ async function cargarLibros() {
 
 function seleccionarLibro(libro) {
   document.getElementById('editarId').value = libro.id;
-  document.getElementById('editarTitulo').value = libro.titulo;
-  document.getElementById('editarAutor').value = libro.autor;
-  document.getElementById('editarDescripcion').value = libro.descripcion;
+  document.getElementById('editarTitulo').value = libro.name;
+  document.getElementById('editarAutor').value = libro.author;
+  document.getElementById('editarDescripcion').value = libro.description;
 }

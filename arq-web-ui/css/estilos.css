@@ -142,10 +142,12 @@ button:hover {
 
 button.danger {
   background-color: #003366;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 button.danger:hover {
-  background-color: #003366;
+  background-color: #002244;
 }
 
 /* botones para formularios */

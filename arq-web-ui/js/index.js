@@ -6,11 +6,11 @@ window.addEventListener('DOMContentLoaded', async () => {
   try {
     const usuario = await window.Api.getUsuarioActual();
 
-    if (usuario.rol === 'admin') {
+    if (usuario.privilegios?.includes('USERS_LIST')) {
       document.getElementById('usuariosCard').style.display = 'block';
     }
 
-    document.querySelector('.header h1, .bienvenida-texto').textContent = `Hola, ${usuario.nombre}`;
+    document.querySelector('.bienvenida-texto').textContent = `Hola, ${usuario.nombre}`;
   } catch (error) {
     errorContainer.textContent = error.message;
     errorContainer.style.display = 'block';
@@ -19,4 +19,11 @@ window.addEventListener('DOMContentLoaded', async () => {
       window.location.href = 'login.html';
     }, 3000);
   }
+
+  const logoutBtn = document.getElementById('logoutBtn');
+  logoutBtn.addEventListener('click', () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    window.location.href = 'login.html';
+  });
 });

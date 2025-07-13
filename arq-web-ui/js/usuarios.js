@@ -19,18 +19,17 @@ document.getElementById('crearUsuarioForm').addEventListener('submit', async e =
   e.preventDefault();
   limpiarError();
 
-  const nombre = document.getElementById('crearNombre').value;
-  const email = document.getElementById('crearEmail').value;
-  const password = document.getElementById('crearPassword').value;
-
-  const privilegios = {
-    crear: document.querySelector('input[name="crear"]').checked,
-    leer: document.querySelector('input[name="leer"]').checked,
-    editar: document.querySelector('input[name="editar"]').checked,
-    eliminar: document.querySelector('input[name="eliminar"]').checked
+  const usuario = {
+    nombre: document.getElementById('crearNombre').value,
+    email: document.getElementById('crearEmail').value,
+    password: document.getElementById('crearPassword').value,
+    privilegios: []
   };
-
-  const usuario = { nombre, email, password, privilegios };
+  
+  if (document.querySelector('input[name="crear"]').checked) usuario.privilegios.push("BOOKS_CREATE");
+  if (document.querySelector('input[name="leer"]').checked) usuario.privilegios.push("BOOKS_LIST");
+  if (document.querySelector('input[name="editar"]').checked) usuario.privilegios.push("BOOKS_UPDATE");
+  if (document.querySelector('input[name="eliminar"]').checked) usuario.privilegios.push("BOOKS_DELETE");
 
   try {
     await window.Api.crearUsuario(usuario);
@@ -49,12 +48,11 @@ document.getElementById('editarUsuarioForm').addEventListener('submit', async e 
   const nombre = document.getElementById('editarNombre').value;
   const email = document.getElementById('editarEmail').value;
 
-  const privilegios = {
-    crear: document.querySelector('input[name="editarCrear"]').checked,
-    leer: document.querySelector('input[name="editarLeer"]').checked,
-    editar: document.querySelector('input[name="editarEditar"]').checked,
-    eliminar: document.querySelector('input[name="editarEliminar"]').checked
-  };
+  const privilegios = [];
+  if (document.querySelector('input[name="editarCrear"]').checked) privilegios.push("BOOKS_CREATE");
+  if (document.querySelector('input[name="editarLeer"]').checked) privilegios.push("BOOKS_LIST");
+  if (document.querySelector('input[name="editarEditar"]').checked) privilegios.push("BOOKS_UPDATE");
+  if (document.querySelector('input[name="editarEliminar"]').checked) privilegios.push("BOOKS_DELETE");
 
   const usuario = { nombre, email, privilegios };
 
@@ -95,10 +93,7 @@ async function cargarUsuarios() {
         <td>${user.id}</td>
         <td>${user.nombre}</td>
         <td>${user.email}</td>
-        <td>${Object.entries(user.privilegios)
-          .filter(([_, val]) => val)
-          .map(([key]) => key)
-          .join(', ')}</td>
+        <td>${user.privilegios?.join(', ') || 'Sin privilegios'}</td>
       `;
       fila.addEventListener('click', () => seleccionarUsuario(user));
       tbody.appendChild(fila);
@@ -113,10 +108,12 @@ function seleccionarUsuario(user) {
   document.getElementById('editarNombre').value = user.nombre;
   document.getElementById('editarEmail').value = user.email;
 
-  document.querySelector('input[name="editarCrear"]').checked = user.privilegios.crear;
-  document.querySelector('input[name="editarLeer"]').checked = user.privilegios.leer;
-  document.querySelector('input[name="editarEditar"]').checked = user.privilegios.editar;
-  document.querySelector('input[name="editarEliminar"]').checked = user.privilegios.eliminar;
+  const privs = user.privilegios || [];
+
+  document.querySelector('input[name="editarCrear"]').checked = privs.includes("BOOKS_CREATE");
+  document.querySelector('input[name="editarLeer"]').checked = privs.includes("BOOKS_LIST");
+  document.querySelector('input[name="editarEditar"]').checked = privs.includes("BOOKS_UPDATE");
+  document.querySelector('input[name="editarEliminar"]').checked = privs.includes("BOOKS_DELETE");
 }
 
 function mostrarError(msg) {

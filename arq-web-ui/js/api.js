@@ -24,7 +24,7 @@ window.Api = {
     const token = localStorage.getItem('token');
     if (!token) throw new Error('Token no encontrado');
 
-    const response = await fetch(`${ApiUrl}/iam/me`, {
+    const response = await fetch(`${ApiUrl}/iam/perfil`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -42,7 +42,7 @@ window.Api = {
   //libros
   async getLibros() {
     const token = localStorage.getItem('token');
-    const res = await fetch(`${ApiUrl}/libros`, {
+    const res = await fetch(`${ApiUrl}/books`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     if (!res.ok) throw new Error('Error al cargar libros');
@@ -51,7 +51,7 @@ window.Api = {
 
   async crearLibro(libro) {
     const token = localStorage.getItem('token');
-    const res = await fetch(`${ApiUrl}/libros`, {
+    const res = await fetch(`${ApiUrl}/books`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -64,7 +64,7 @@ window.Api = {
 
   async editarLibro(id, libro) {
     const token = localStorage.getItem('token');
-    const res = await fetch(`${ApiUrl}/libros/${id}`, {
+    const res = await fetch(`${ApiUrl}/books/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -77,7 +77,7 @@ window.Api = {
 
   async eliminarLibro(id) {
     const token = localStorage.getItem('token');
-    const res = await fetch(`${ApiUrl}/libros/${id}`, {
+    const res = await fetch(`${ApiUrl}/books/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });
@@ -87,7 +87,7 @@ window.Api = {
   //usuarios
   async getUsuarios() {
     const token = localStorage.getItem('token');
-    const res = await fetch(`${ApiUrl}/usuarios`, {
+    const res = await fetch(`${ApiUrl}/users`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     if (!res.ok) throw new Error('Error al cargar usuarios');
@@ -96,7 +96,7 @@ window.Api = {
 
   async crearUsuario(usuario) {
     const token = localStorage.getItem('token');
-    const res = await fetch(`${ApiUrl}/usuarios`, {
+    const res = await fetch(`${ApiUrl}/iam/registro`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -104,12 +104,16 @@ window.Api = {
       },
       body: JSON.stringify(usuario)
     });
-    if (!res.ok) throw new Error('Error al crear usuario');
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.message || 'Error al crear usuario');
+    }
   },
 
   async editarUsuario(id, usuario) {
     const token = localStorage.getItem('token');
-    const res = await fetch(`${ApiUrl}/usuarios/${id}`, {
+    const res = await fetch(`${ApiUrl}/users/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -122,7 +126,7 @@ window.Api = {
 
   async eliminarUsuario(id) {
     const token = localStorage.getItem('token');
-    const res = await fetch(`${ApiUrl}/usuarios/${id}`, {
+    const res = await fetch(`${ApiUrl}/users/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });
