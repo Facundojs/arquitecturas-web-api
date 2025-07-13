@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestión de Usuarios</title>
+  <link rel="stylesheet" href="css/estilos.css" />
+</head>
+<body>
+  <header class="header">
+    <h1>Gestión de Usuarios</h1>
+    <button id="logoutBtn">Cerrar Sesión</button>
+  </header>
+
+  <main class="contenedor-libros">
+    <!-- formulario crear usuario -->
+    <section class="form-crear">
+      <h2>Crear Usuario</h2>
+      <form id="crearUsuarioForm">
+        <input type="text" id="crearNombre" placeholder="Nombre" required />
+        <input type="email" id="crearEmail" placeholder="Email" required />
+        <input type="password" id="crearPassword" placeholder="Contraseña" required />
+
+        <div class="privilegios">
+          <label><input type="checkbox" name="crear" /> Crear</label>
+          <label><input type="checkbox" name="leer" /> Leer</label>
+          <label><input type="checkbox" name="editar" /> Editar</label>
+          <label><input type="checkbox" name="eliminar" /> Eliminar</label>
+        </div>
+
+        <div class="botones-accion">
+          <button type="submit">Crear</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- tabla de usuarios -->
+    <section class="tabla-libros">
+      <h2>Usuarios Registrados</h2>
+      <table id="tablaUsuarios">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Privilegios</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- js trae las filas -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- formulario editar usuario -->
+    <section class="form-editar">
+      <h2>Editar Usuario</h2>
+      <form id="editarUsuarioForm">
+        <input type="hidden" id="editarId" />
+        <input type="text" id="editarNombre" placeholder="Nombre" required />
+        <input type="email" id="editarEmail" placeholder="Email" required />
+
+        <div class="privilegios">
+          <label><input type="checkbox" name="editarCrear" /> Crear</label>
+          <label><input type="checkbox" name="editarLeer" /> Leer</label>
+          <label><input type="checkbox" name="editarEditar" /> Editar</label>
+          <label><input type="checkbox" name="editarEliminar" /> Eliminar</label>
+        </div>
+
+        <div class="botones-accion">
+          <button type="submit">Guardar</button>
+          <button type="button" id="eliminarUsuarioBtn" class="danger">Eliminar</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="js/usuarios.js"></script>
+</body>
+</html>

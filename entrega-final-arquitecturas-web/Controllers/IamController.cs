@@ -22,7 +22,8 @@ namespace entrega_final_arquitecturas_web.Controllers
             var userId = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             var user = await GetUserWithPrivilegesByIdAsync(userId);
 
-            if(user == null || !user.Privileges.Any(p => p == "ADMIN")) {
+            if (user == null || !user.Privileges.Any(p => p == "ADMIN"))
+            {
                 return StatusCode(StatusCodes.Status403Forbidden);
             }
 

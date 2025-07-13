@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestión de Libros y Cómics</title>
+  <link rel="stylesheet" href="css/estilos.css" />
+</head>
+<body>
+  <header class="header">
+    <h1>Gestión de Libros y Cómics</h1>
+    <button id="logoutBtn">Cerrar Sesión</button>
+  </header>
+
+  <main class="contenedor-libros">
+    <!-- formulario crear -->
+    <section class="form-crear">
+      <h2>Crear nuevo</h2>
+      <form id="crearForm">
+        <input type="text" id="crearTitulo" placeholder="Título" required />
+        <input type="text" id="crearAutor" placeholder="Autor" required />
+        <textarea id="crearDescripcion" placeholder="Descripción" required></textarea>
+        <div class="botones-accion">
+          <button type="submit">Crear</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- tabla -->
+    <section class="tabla-libros">
+      <h2>Libros y Cómics registrados</h2>
+      <table id="tablaLibros">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Autor</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- js trae las filas -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- formulario editar -->
+    <section class="form-editar">
+      <h2>Editar seleccionado</h2>
+      <form id="editarForm">
+        <input type="hidden" id="editarId" />
+        <input type="text" id="editarTitulo" placeholder="Título" required />
+        <input type="text" id="editarAutor" placeholder="Autor" required />
+        <textarea id="editarDescripcion" placeholder="Descripción" required></textarea>
+        <div class="botones-accion">
+          <button type="submit">Guardar</button>
+          <button type="button" id="eliminarBtn" class="danger">Eliminar</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="js/libros.js"></script>
+</body>
+</html>

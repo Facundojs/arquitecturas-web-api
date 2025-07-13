@@ -1,0 +1,252 @@
+/* base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", sans-serif;
+  background-color: #f3f4f6;
+  color: #333;
+  padding: 20px;
+}
+
+/* encabezado general */
+.header,
+.barra-superior {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #003366;
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.header h1,
+.bienvenida-texto {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+/* boton cerrar sesion */
+.header button,
+.boton-salir {
+  background-color: white;
+  color: #003366;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.header button:hover,
+.boton-salir:hover {
+  background-color: #bbb;
+}
+
+/* contenedores */
+.main-container,
+.contenedor-principal {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.contenedor-principal {
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: center;
+}
+
+/* tarjtas */
+.card,
+.tarjeta {
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+
+.card:hover,
+.tarjeta:hover {
+  transform: translateY(-4px);
+}
+
+.card h2,
+.tarjeta h2 {
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+}
+
+.card p,
+.tarjeta p {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+@media (min-width: 768px) {
+  .card,
+  .tarjeta {
+    width: 45%;
+  }
+}
+
+/* formularios */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+input, textarea, select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* botones generales */
+button {
+  background-color: #003366;
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #002244;
+}
+
+button.danger {
+  background-color: #003366;
+}
+
+button.danger:hover {
+  background-color: #003366;
+}
+
+/* botones para formularios */
+.botones-accion {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.botones-accion button {
+  padding: 8px 16px;
+  font-size: 0.95rem;
+  min-width: 120px;
+}
+
+/* tablas */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+th, td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+thead {
+  background-color: #003366;
+  color: white;
+}
+
+tr:hover {
+  background-color: #f1f1f1;
+  cursor: pointer;
+}
+
+.form-section, 
+.tabla-section {
+  width: 100%;
+}
+
+/* login y registro */
+.login-container,
+.registro-container {
+  max-width: 400px;
+  margin: 50px auto;
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 12px rgba(0,0,0,0.1);
+}
+
+.login-container h1,
+.registro-container h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.login-container p,
+.registro-container p {
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+/* privilegios de usuario */
+.privilegios {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.privilegios label {
+  font-size: 0.95rem;
+}
+
+/* diseño */
+.contenedor-libros {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  grid-template-rows: auto auto;
+  gap: 30px;
+}
+
+.form-crear {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+}
+
+.form-editar {
+  grid-column: 1 / 2;
+  grid-row: 2 / 3;
+}
+
+.tabla-libros {
+  grid-column: 2 / 3;
+  grid-row: 1 / 3;
+}
