@@ -1,14 +1,14 @@
-const userApi = 'https://tubackend.com/api/usuarios' /* backeend!!!!!!!!!!!!!!!!! */;
-let token = localStorage.getItem('token');
-
-if (!token) window.location.href = 'login.html';
-
-const headers = {
-  'Content-Type': 'application/json',
-  'Authorization': `Bearer ${token}`
-};
-
-window.addEventListener('DOMContentLoaded', cargarUsuarios);
+window.addEventListener('DOMContentLoaded', async () => {
+  const errorContainer = document.getElementById('error-message');
+  try {
+    await window.Api.getUsuarioActual();
+    cargarUsuarios();
+  } catch (err) {
+    mostrarError(err.message);
+    localStorage.removeItem('token');
+    setTimeout(() => window.location.href = 'login.html', 3000);
+  }
+});
 
 document.getElementById('logoutBtn').addEventListener('click', () => {
   localStorage.removeItem('token');
@@ -17,6 +17,8 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
 
 document.getElementById('crearUsuarioForm').addEventListener('submit', async e => {
   e.preventDefault();
+  limpiarError();
+
   const nombre = document.getElementById('crearNombre').value;
   const email = document.getElementById('crearEmail').value;
   const password = document.getElementById('crearPassword').value;
@@ -30,23 +32,19 @@ document.getElementById('crearUsuarioForm').addEventListener('submit', async e =
 
   const usuario = { nombre, email, password, privilegios };
 
-  const res = await fetch(userApi, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify(usuario)
-  });
-
-  if (res.ok) {
-    alert('Usuario creado');
+  try {
+    await window.Api.crearUsuario(usuario);
     e.target.reset();
     cargarUsuarios();
-  } else {
-    alert('Error al crear usuario');
+  } catch (err) {
+    mostrarError(err.message);
   }
 });
 
 document.getElementById('editarUsuarioForm').addEventListener('submit', async e => {
   e.preventDefault();
+  limpiarError();
+
   const id = document.getElementById('editarId').value;
   const nombre = document.getElementById('editarNombre').value;
   const email = document.getElementById('editarEmail').value;
@@ -60,17 +58,11 @@ document.getElementById('editarUsuarioForm').addEventListener('submit', async e 
 
   const usuario = { nombre, email, privilegios };
 
-  const res = await fetch(`${userApi}/${id}`, {
-    method: 'PUT',
-    headers,
-    body: JSON.stringify(usuario)
-  });
-
-  if (res.ok) {
-    alert('Usuario actualizado');
+  try {
+    await window.Api.editarUsuario(id, usuario);
     cargarUsuarios();
-  } else {
-    alert('Error al actualizar');
+  } catch (err) {
+    mostrarError(err.message);
   }
 });
 
@@ -78,39 +70,42 @@ document.getElementById('eliminarUsuarioBtn').addEventListener('click', async ()
   const id = document.getElementById('editarId').value;
   if (!confirm('¿Eliminar este usuario?')) return;
 
-  const res = await fetch(`${userApi}/${id}`, {
-    method: 'DELETE',
-    headers
-  });
+  limpiarError();
 
-  if (res.ok) {
-    alert('Usuario eliminado');
-    cargarUsuarios();
+  try {
+    await window.Api.eliminarUsuario(id);
     document.getElementById('editarUsuarioForm').reset();
-  } else {
-    alert('Error al eliminar');
+    cargarUsuarios();
+  } catch (err) {
+    mostrarError(err.message);
   }
 });
 
 async function cargarUsuarios() {
-  const res = await fetch(userApi, { headers });
-  const data = await res.json();
-  const tbody = document.querySelector('#tablaUsuarios tbody');
-  tbody.innerHTML = '';
+  limpiarError();
 
-  data.forEach(user => {
-    const fila = document.createElement('tr');
-    fila.innerHTML = `
-      <td>${user.id}</td>
-      <td>${user.nombre}</td>
-      <td>${user.email}</td>
-      <td>${Object.entries(user.privilegios)
-        .filter(([_, val]) => val)
-        .map(([key]) => key).join(', ')}</td>
-    `;
-    fila.addEventListener('click', () => seleccionarUsuario(user));
-    tbody.appendChild(fila);
-  });
+  try {
+    const data = await window.Api.getUsuarios();
+    const tbody = document.querySelector('#tablaUsuarios tbody');
+    tbody.innerHTML = '';
+
+    data.forEach(user => {
+      const fila = document.createElement('tr');
+      fila.innerHTML = `
+        <td>${user.id}</td>
+        <td>${user.nombre}</td>
+        <td>${user.email}</td>
+        <td>${Object.entries(user.privilegios)
+          .filter(([_, val]) => val)
+          .map(([key]) => key)
+          .join(', ')}</td>
+      `;
+      fila.addEventListener('click', () => seleccionarUsuario(user));
+      tbody.appendChild(fila);
+    });
+  } catch (err) {
+    mostrarError(err.message);
+  }
 }
 
 function seleccionarUsuario(user) {
@@ -122,4 +117,16 @@ function seleccionarUsuario(user) {
   document.querySelector('input[name="editarLeer"]').checked = user.privilegios.leer;
   document.querySelector('input[name="editarEditar"]').checked = user.privilegios.editar;
   document.querySelector('input[name="editarEliminar"]').checked = user.privilegios.eliminar;
+}
+
+function mostrarError(msg) {
+  const el = document.getElementById('error-message');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function limpiarError() {
+  const el = document.getElementById('error-message');
+  el.textContent = '';
+  el.style.display = 'none';
 }
