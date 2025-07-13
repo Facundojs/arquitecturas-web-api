@@ -1,8 +1,8 @@
 const ApiUrl = "http://localhost:5188/api";
 
-window.Api = {
+class Api {
   //login
-  async login(email, password) {
+  static async login(email, password) {
     const response = await fetch(`${ApiUrl}/iam/login`, {
       method: 'POST',
       headers: {
@@ -17,10 +17,10 @@ window.Api = {
 
     const data = await response.json();
     return data;
-  },
+  }
 
   //index
-  async getUsuarioActual() {
+  static async getUsuarioActual() {
     const token = localStorage.getItem('token');
     if (!token) throw new Error('Token no encontrado');
 
@@ -37,19 +37,19 @@ window.Api = {
 
     const data = await response.json();
     return data;
-  },
+  }
 
   //libros
-  async getLibros() {
+  static async getLibros() {
     const token = localStorage.getItem('token');
     const res = await fetch(`${ApiUrl}/books`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     if (!res.ok) throw new Error('Error al cargar libros');
     return await res.json();
-  },
+  }
 
-  async crearLibro(libro) {
+  static async crearLibro(libro) {
     const token = localStorage.getItem('token');
     const res = await fetch(`${ApiUrl}/books`, {
       method: 'POST',
@@ -60,9 +60,9 @@ window.Api = {
       body: JSON.stringify(libro)
     });
     if (!res.ok) throw new Error('Error al crear libro');
-  },
+  }
 
-  async editarLibro(id, libro) {
+  static async editarLibro(id, libro) {
     const token = localStorage.getItem('token');
     const res = await fetch(`${ApiUrl}/books/${id}`, {
       method: 'PUT',
@@ -73,30 +73,30 @@ window.Api = {
       body: JSON.stringify(libro)
     });
     if (!res.ok) throw new Error('Error al actualizar libro');
-  },
+  }
 
-  async eliminarLibro(id) {
+  static async eliminarLibro(id) {
     const token = localStorage.getItem('token');
     const res = await fetch(`${ApiUrl}/books/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });
     if (!res.ok) throw new Error('Error al eliminar libro');
-  },
+  }
 
   //usuarios
-  async getUsuarios() {
+  static async getUsuarios() {
     const token = localStorage.getItem('token');
     const res = await fetch(`${ApiUrl}/users`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     if (!res.ok) throw new Error('Error al cargar usuarios');
     return await res.json();
-  },
+  }
 
-  async crearUsuario(usuario) {
+  static async crearUsuario(usuario) {
     const token = localStorage.getItem('token');
-    const res = await fetch(`${ApiUrl}/iam/registro`, {
+    const res = await fetch(`${ApiUrl}/users`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -109,12 +109,12 @@ window.Api = {
       const data = await res.json().catch(() => ({}));
       throw new Error(data.message || 'Error al crear usuario');
     }
-  },
+  }
 
-  async editarUsuario(id, usuario) {
+  static async editarUsuario(id, usuario) {
     const token = localStorage.getItem('token');
     const res = await fetch(`${ApiUrl}/users/${id}`, {
-      method: 'PUT',
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
@@ -122,30 +122,16 @@ window.Api = {
       body: JSON.stringify(usuario)
     });
     if (!res.ok) throw new Error('Error al actualizar usuario');
-  },
+  }
 
-  async eliminarUsuario(id) {
+  static async eliminarUsuario(id) {
     const token = localStorage.getItem('token');
     const res = await fetch(`${ApiUrl}/users/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });
     if (!res.ok) throw new Error('Error al eliminar usuario');
-  },
-
-  //registros
-  async registrarUsuario({ nombre, apellido, email, password }) {
-    const response = await fetch(`${ApiUrl}/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nombre, apellido, email, password })
-    });
-
-    if (!response.ok) {
-      const data = await response.json().catch(() => ({}));
-      throw new Error(data.message || 'Error al registrarse');
-    }
-
-    return await response.json();
   }
-};
+}
+
+window.Api = Api

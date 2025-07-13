@@ -8,7 +8,7 @@
 </head>
 <body>
   <header class="header">
-    <h1>Gestión de Libros y Cómics</h1>
+    <h1><a href="index.html">Gestión de Libros y Cómics</a></h1>
     <button id="logoutBtn">Cerrar Sesión</button>
   </header>
 
@@ -23,7 +23,7 @@
         <input type="text" id="crearAutor" placeholder="Autor" required />
         <textarea id="crearDescripcion" placeholder="Descripción" required></textarea>
         <div class="botones-accion">
-          <button type="submit">Crear</button>
+          <button type="submit" id="crearLibroBtn" >Crear</button>
         </div>
       </form>
     </section>
@@ -55,7 +55,7 @@
         <input type="text" id="editarAutor" placeholder="Autor" required />
         <textarea id="editarDescripcion" placeholder="Descripción" required></textarea>
         <div class="botones-accion">
-          <button type="submit">Guardar</button>
+          <button type="submit" id="editarBtn">Guardar</button>
           <button type="button" id="eliminarBtn" class="danger">Eliminar</button>
         </div>
       </form>

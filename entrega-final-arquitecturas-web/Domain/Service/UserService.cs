@@ -32,8 +32,6 @@ namespace entrega_final_arquitecturas_web.Domain.Service
 
             return result;
         }
-
-
         public async Task<UserWithPrivileges> GetUserWithPrivilegesByIdAsync(int userId)
         {
             var user = await dbCtx.Users
@@ -60,5 +58,28 @@ namespace entrega_final_arquitecturas_web.Domain.Service
                     .ToList()
             };
         }
+
+        public async Task<List<Privilege>> ValidatePrivileges(List<string> privileges) {
+            // traer los privilegios de la base
+
+            var privilegiosEnBbdd = await dbCtx.Privileges
+                .Where(p => privileges.Contains(p.Name))
+                .ToListAsync();
+
+            // Validar si hay privilegios inexistentes
+            var nombresEncontrados = privilegiosEnBbdd.Select(p => p.Name).ToList();
+                
+            var nombresInvalidos = privileges
+                    .Except(nombresEncontrados, StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+
+            if (nombresInvalidos.Count > 0)
+            {
+                throw new Exception(String.Join(",", nombresInvalidos));
+            }
+
+            return privilegiosEnBbdd;
+        }
+
     }
 }

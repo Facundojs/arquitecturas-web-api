@@ -1,4 +1,43 @@
 window.addEventListener('DOMContentLoaded', async () => {
+
+  try {
+    const usuario = await window.Api.getUsuarioActual();
+
+    if (!usuario.privilegios?.includes('BOOKS_CREATE')) {
+      document.getElementById("crearTitulo").setAttribute('disabled', true)
+      document.getElementById("crearAutor").setAttribute('disabled', true)
+      document.getElementById("crearDescripcion").setAttribute('disabled', true)
+      document.getElementById("crearLibroBtn").setAttribute('disabled', true)
+    }
+
+    if (!usuario.privilegios?.includes('BOOKS_DELETE')) {
+      document.getElementById("eliminarBtn").setAttribute('disabled', true)
+    }
+
+    if (usuario.privilegios?.includes('BOOKS_LIST')) {
+      document.getElementById('tablaLibros').style.display = 'block';
+    }
+
+    if (!usuario.privilegios?.includes('BOOKS_UPDATE')) {
+      document.getElementById("editarTitulo").setAttribute('disabled', true)
+      document.getElementById("editarAutor").setAttribute('disabled', true)
+      document.getElementById("editarDescripcion").setAttribute('disabled', true)
+      document.getElementById("editarBtn").setAttribute('disabled', true)
+    }
+
+  } catch (error) {
+    errorContainer.textContent = error.message;
+    errorContainer.style.display = 'block';
+    localStorage.removeItem('token');
+    setTimeout(() => {
+      window.location.href = 'login.html';
+    });
+  }
+
+});
+
+
+window.addEventListener('DOMContentLoaded', async () => {
   const errorContainer = document.getElementById('error-message');
   try {
     await window.Api.getUsuarioActual();

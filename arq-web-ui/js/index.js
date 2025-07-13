@@ -10,6 +10,10 @@ window.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('usuariosCard').style.display = 'block';
     }
 
+    if (usuario.privilegios?.includes('BOOKS_LIST')) {
+      document.getElementById('librosCard').style.display = 'block';
+    }
+
     document.querySelector('.bienvenida-texto').textContent = `Hola, ${usuario.nombre}`;
   } catch (error) {
     errorContainer.textContent = error.message;
@@ -17,7 +21,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     localStorage.removeItem('token');
     setTimeout(() => {
       window.location.href = 'login.html';
-    }, 3000);
+    });
   }
 
   const logoutBtn = document.getElementById('logoutBtn');

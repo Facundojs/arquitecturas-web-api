@@ -25,7 +25,7 @@ document.getElementById('crearUsuarioForm').addEventListener('submit', async e =
     password: document.getElementById('crearPassword').value,
     privilegios: []
   };
-  
+
   if (document.querySelector('input[name="crear"]').checked) usuario.privilegios.push("BOOKS_CREATE");
   if (document.querySelector('input[name="leer"]').checked) usuario.privilegios.push("BOOKS_LIST");
   if (document.querySelector('input[name="editar"]').checked) usuario.privilegios.push("BOOKS_UPDATE");

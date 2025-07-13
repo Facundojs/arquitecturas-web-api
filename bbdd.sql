@@ -41,8 +41,14 @@ CREATE TABLE Books (
 )
 
 INSERT INTO Privileges (Name) VALUES
-('Admin'),
-('User');
+    ('BOOKS_LIST'),
+    ('BOOKS_CREATE'),
+    ('BOOKS_DELETE'),
+    ('BOOKS_UPDATE'),
+    ('USERS_LIST'),
+    ('USERS_CREATE'),
+    ('USERS_DELETE'),
+    ('USERS_UPDATE');
 
 INSERT INTO Books (Name, Description, Author, Category) VALUES
 ('Cien años de soledad', 'Una novela que narra la historia de la familia Buendía a lo largo de varias generaciones en el pueblo ficticio de Macondo.', 'Gabriel García Márquez', 'Realismo Mágico'),

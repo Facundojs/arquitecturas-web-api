@@ -18,7 +18,6 @@
         public static readonly PrivilegeEnum USERS_CREATE = new PrivilegeEnum("USERS_CREATE");
         public static readonly PrivilegeEnum USERS_DELETE = new PrivilegeEnum("USERS_DELETE");
         public static readonly PrivilegeEnum USERS_UPDATE = new PrivilegeEnum("USERS_UPDATE");
-        public static readonly PrivilegeEnum USERS_UPDATE_PRIVILEGES = new PrivilegeEnum("USERS_UPDATE_PRIVILEGES");
 
         private static readonly List<PrivilegeEnum> All = new()
             {
@@ -30,7 +29,6 @@
                 USERS_CREATE,
                 USERS_DELETE,
                 USERS_UPDATE,
-                USERS_UPDATE_PRIVILEGES
             };
 
         public static PrivilegeEnum FromName(string name)
