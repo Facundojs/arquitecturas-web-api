@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using entrega_final_arquitecturas_web.DAL.Models;
 using entrega_final_arquitecturas_web.Domain.Service;
 using entrega_final_arquitecturas_web.Domain.DTO;
+using System;
+using System.Security.Claims;
 
 namespace entrega_final_arquitecturas_web.Controllers
 {
@@ -17,13 +19,21 @@ namespace entrega_final_arquitecturas_web.Controllers
         [Route("registro")]
         public async Task<IActionResult> Registro(RegistroDTO dto)
         {
-            var usuarioExistente = await dbCtx.Users.Where(u => u.Email == dto.Email).FirstOrDefaultAsync();
+            var userId = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var user = await GetUserWithPrivilegesByIdAsync(userId);
+
+            if(user == null || !user.Privileges.Any(p => p == "ADMIN")) {
+                return StatusCode(StatusCodes.Status403Forbidden);
+            }
+
+            var usuarioExistente = await dbCtx.Users.Where(u => u.Email == dto.Email)
+                .FirstOrDefaultAsync();
 
             if(usuarioExistente != null) return StatusCode(StatusCodes.Status412PreconditionFailed);
 
             var Salt = jwtService.GenerateSalt();
 
-            var user = new User
+            var newUser = new User
             {
                 PasswordHash = jwtService.EncryptSHA256(dto.Password, Salt),
                 UserName = dto.Nombre,
@@ -31,15 +41,14 @@ namespace entrega_final_arquitecturas_web.Controllers
                 Salt = Salt,
             };
 
-            await dbCtx.Users.AddAsync(user);
+            await dbCtx.Users.AddAsync(newUser);
             await dbCtx.SaveChangesAsync();
 
-            var success = user.Id != 0;
+            var success = newUser.Id != 0;
             var statusCode = success ? StatusCodes.Status200OK : StatusCodes.Status422UnprocessableEntity;
 
             return StatusCode(statusCode);
         }
-
 
         [HttpPost]
         [Route("login")]
@@ -119,6 +128,32 @@ namespace entrega_final_arquitecturas_web.Controllers
                 token = newAccessToken,
                 refreshToken = newRefreshToken
             });
+        }
+
+        private async Task<UserWithPrivilegesDTO?> GetUserWithPrivilegesByIdAsync(int userId)
+        {
+            var user = await dbCtx.Users
+                .Where(u => u.Id == userId)
+                .Select(u => new UserWithPrivilegesDTO
+                {
+                    Id = u.Id,
+                    UserName = u.UserName,
+                    Email = u.Email,
+                    Privileges = u.UsersPrivileges
+                        .Select(up => up.Privilege.Description)
+                        .ToList()
+                })
+                .FirstOrDefaultAsync();
+
+            return user;
+        }
+
+        private class UserWithPrivilegesDTO
+        {
+            public int Id { get; set; }
+            public string UserName { get; set; } = null!;
+            public string Email { get; set; } = null!;
+            public List<string> Privileges { get; set; } = new();
         }
     }
 }

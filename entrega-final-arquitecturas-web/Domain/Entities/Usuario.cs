@@ -7,7 +7,7 @@ namespace entrega_final_arquitecturas_web.Domain.Entities
     {
         public string Nombre { get; set; }
         public int Id { get; set; }
-        public int Email{ get; set; }
+        public string Email { get; set; }
 
     }
 }
