@@ -6,9 +6,11 @@
   <title>Registro</title>
   <link rel="stylesheet" href="css/estilos.css" />
 </head>
+
 <body>
   <main class="registro-container">
     <h1>Crear Cuenta</h1>
+    <div id="error-message" class="error-message" style="display: none;"></div>
     <form id="registroForm">
       <input type="text" id="nombre" placeholder="Nombre" required />
       <input type="text" id="apellido" placeholder="Apellido" required />
@@ -20,6 +22,7 @@
       <p>¿Ya tenés cuenta? <a href="login.html">Volver al login</a></p>
     </form>
   </main>
+  <script src="./js/api.js"></script>
   <script src="js/registro.js"></script>
 </body>
 </html>

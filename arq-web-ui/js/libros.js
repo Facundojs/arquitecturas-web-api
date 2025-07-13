@@ -1,14 +1,15 @@
-const apiURL = 'https://tubackend.com/api/libros'; /* backeend!!!!!!!!!!!!!!!!! */
-let token = localStorage.getItem('token');
-
-if (!token) window.location.href = 'login.html';
-
-const headers = {
-  'Content-Type': 'application/json',
-  'Authorization': `Bearer ${token}`
-};
-
-window.addEventListener('DOMContentLoaded', cargarLibros);
+window.addEventListener('DOMContentLoaded', async () => {
+  const errorContainer = document.getElementById('error-message');
+  try {
+    await window.Api.getUsuarioActual();
+    cargarLibros();
+  } catch (err) {
+    errorContainer.textContent = err.message;
+    errorContainer.style.display = 'block';
+    localStorage.removeItem('token');
+    setTimeout(() => window.location.href = 'login.html', 3000);
+  }
+});
 
 document.getElementById('logoutBtn').addEventListener('click', () => {
   localStorage.removeItem('token');
@@ -17,47 +18,47 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
 
 document.getElementById('crearForm').addEventListener('submit', async e => {
   e.preventDefault();
+  const errorContainer = document.getElementById('error-message');
+  errorContainer.style.display = 'none';
+  errorContainer.textContent = '';
+
   const nuevo = {
-    titulo: document.getElementById('crearTitulo').value,
-    autor: document.getElementById('crearAutor').value,
-    descripcion: document.getElementById('crearDescripcion').value
+    Nombre: document.getElementById('crearTitulo').value,
+    Autor: document.getElementById('crearAutor').value,
+    Descripcion: document.getElementById('crearDescripcion').value,
+    Categoria: "General"
   };
 
-  const res = await fetch(apiURL, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify(nuevo)
-  });
-
-  if (res.ok) {
-    alert('Libro creado con éxito');
+  try {
+    await window.Api.crearLibro(nuevo);
     document.getElementById('crearForm').reset();
     cargarLibros();
-  } else {
-    alert('Error al crear');
+  } catch (err) {
+    errorContainer.textContent = err.message;
+    errorContainer.style.display = 'block';
   }
 });
 
 document.getElementById('editarForm').addEventListener('submit', async e => {
   e.preventDefault();
+  const errorContainer = document.getElementById('error-message');
+  errorContainer.style.display = 'none';
+  errorContainer.textContent = '';
+
   const id = document.getElementById('editarId').value;
   const modificado = {
-    titulo: document.getElementById('editarTitulo').value,
-    autor: document.getElementById('editarAutor').value,
-    descripcion: document.getElementById('editarDescripcion').value
+    Nombre: document.getElementById('editarTitulo').value,
+    Autor: document.getElementById('editarAutor').value,
+    Descripcion: document.getElementById('editarDescripcion').value,
+    Categoria: "General"
   };
 
-  const res = await fetch(`${apiURL}/${id}`, {
-    method: 'PUT',
-    headers,
-    body: JSON.stringify(modificado)
-  });
-
-  if (res.ok) {
-    alert('Libro actualizado');
+  try {
+    await window.Api.editarLibro(id, modificado);
     cargarLibros();
-  } else {
-    alert('Error al actualizar');
+  } catch (err) {
+    errorContainer.textContent = err.message;
+    errorContainer.style.display = 'block';
   }
 });
 
@@ -65,42 +66,50 @@ document.getElementById('eliminarBtn').addEventListener('click', async () => {
   const id = document.getElementById('editarId').value;
   if (!confirm('¿Seguro que querés eliminar este registro?')) return;
 
-  const res = await fetch(`${apiURL}/${id}`, {
-    method: 'DELETE',
-    headers
-  });
+  const errorContainer = document.getElementById('error-message');
+  errorContainer.style.display = 'none';
+  errorContainer.textContent = '';
 
-  if (res.ok) {
-    alert('Libro eliminado');
-    cargarLibros();
+  try {
+    await window.Api.eliminarLibro(id);
     document.getElementById('editarForm').reset();
-  } else {
-    alert('Error al eliminar');
+    cargarLibros();
+  } catch (err) {
+    errorContainer.textContent = err.message;
+    errorContainer.style.display = 'block';
   }
 });
 
 async function cargarLibros() {
-  const res = await fetch(apiURL, { headers });
-  const data = await res.json();
-  const tbody = document.querySelector('#tablaLibros tbody');
-  tbody.innerHTML = '';
+  const errorContainer = document.getElementById('error-message');
+  errorContainer.style.display = 'none';
+  errorContainer.textContent = '';
 
-  data.forEach(libro => {
-    const fila = document.createElement('tr');
-    fila.innerHTML = `
-      <td>${libro.id}</td>
-      <td>${libro.titulo}</td>
-      <td>${libro.autor}</td>
-      <td>${libro.descripcion}</td>
-    `;
-    fila.addEventListener('click', () => seleccionarLibro(libro));
-    tbody.appendChild(fila);
-  });
+  try {
+    const data = await window.Api.getLibros();
+    const tbody = document.querySelector('#tablaLibros tbody');
+    tbody.innerHTML = '';
+
+    data.forEach(libro => {
+      const fila = document.createElement('tr');
+      fila.innerHTML = `
+        <td>${libro.id}</td>
+        <td>${libro.name}</td>
+        <td>${libro.author}</td>
+        <td>${libro.description}</td>
+      `;
+      fila.addEventListener('click', () => seleccionarLibro(libro));
+      tbody.appendChild(fila);
+    });
+  } catch (err) {
+    errorContainer.textContent = err.message;
+    errorContainer.style.display = 'block';
+  }
 }
 
 function seleccionarLibro(libro) {
   document.getElementById('editarId').value = libro.id;
-  document.getElementById('editarTitulo').value = libro.titulo;
-  document.getElementById('editarAutor').value = libro.autor;
-  document.getElementById('editarDescripcion').value = libro.descripcion;
+  document.getElementById('editarTitulo').value = libro.name;
+  document.getElementById('editarAutor').value = libro.author;
+  document.getElementById('editarDescripcion').value = libro.description;
 }

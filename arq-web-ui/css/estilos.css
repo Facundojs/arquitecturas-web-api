@@ -142,10 +142,12 @@ button:hover {
 
 button.danger {
   background-color: #003366;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 button.danger:hover {
-  background-color: #003366;
+  background-color: #002244;
 }
 
 /* botones para formularios */
@@ -249,4 +251,11 @@ tr:hover {
 .tabla-libros {
   grid-column: 2 / 3;
   grid-row: 1 / 3;
+}
+
+/* alertas */
+.error-message {
+  color: red;
+  margin-bottom: 1rem;
+  font-weight: bold;
 }

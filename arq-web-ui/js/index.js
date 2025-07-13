@@ -1,21 +1,29 @@
-window.addEventListener('DOMContentLoaded', () => {
-  const token = localStorage.getItem('token');
+window.addEventListener('DOMContentLoaded', async () => {
+  const errorContainer = document.getElementById('error-message');
+  errorContainer.style.display = 'none';
+  errorContainer.textContent = '';
 
-  if (!token) {
+  try {
+    const usuario = await window.Api.getUsuarioActual();
+
+    if (usuario.privilegios?.includes('USERS_LIST')) {
+      document.getElementById('usuariosCard').style.display = 'block';
+    }
+
+    document.querySelector('.bienvenida-texto').textContent = `Hola, ${usuario.nombre}`;
+  } catch (error) {
+    errorContainer.textContent = error.message;
+    errorContainer.style.display = 'block';
+    localStorage.removeItem('token');
+    setTimeout(() => {
+      window.location.href = 'login.html';
+    }, 3000);
+  }
+
+  const logoutBtn = document.getElementById('logoutBtn');
+  logoutBtn.addEventListener('click', () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
     window.location.href = 'login.html';
-    return;
-  }
-
-  const payload = JSON.parse(atob(token.split('.')[1]));
-
-  if (payload.rol === 'admin') {
-    document.getElementById('usuariosCard').style.display = 'block';
-  }
-
-  document.querySelector('.header h1').textContent = `Hola, ${payload.nombre || 'usuario'}`;
-});
-
-document.getElementById('logoutBtn').addEventListener('click', () => {
-  localStorage.removeItem('token');
-  window.location.href = 'login.html';
+  });
 });
